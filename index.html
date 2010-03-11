@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4+01//EN" "http://www+w3+org/TR/html4/strict+dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+  <title>YQL Geo Library - get all your geo needs in JavaScript - geolocation, reverse geocoding, content analysis</title>
+  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.8.0/build/reset-fonts-grids/reset-fonts-grids.css&2.8.0/build/base/base-min.css">
+<style type="text/css" media="screen">
+  body,html{background:#999;color:#000;}
+  #doc{background:#fff;border:1em solid #fff;}
+  h1,h2,h3{font-family:calibri,sans-serif;clear:both;}
+  a{color:#369;}
+  pre{border:1px solid #999;background:#eee;padding:.5em;clear:both;margin:1em 0;}
+  h1{margin:0 0 .5em 0;}
+  button{float:right;margin:.5em;}
+  h1{color:#393;font-size:200%;}
+  #ft p{color:#ccc;margin:2em 0;text-align:right;font-size:80%;}
+  #ft p a{color:#999;}
+  
+</style>
+</head>
+<body class="yui-skin-sam">
+<div id="doc" class="yui-t7">
+
+  <div id="hd" role="banner">
+    <h1>YQL Geo Library - get all your geo needs in JavaScript - geolocation, reverse geocoding, content analysis</h1>
+  </div>
+  <div id="bd" role="main">
+    <p>As an aid for the Georgia Tech Hack 2010 and as a follow-up <a href="http://www.slideshare.net/cheilmann/introduction-to-geo-hacking-with-amongst-others-yahoo-technology-3388374">to my talk about geolocation</a> here is a simple JavaScript library that answers most of your geo questions. It wraps the following services in a simple interface:</p>
+    <ul>
+      <li><a href="http://developer.yahoo.com/geo/placemaker">Yahoo Placemaker</a></li>
+      <li><a href="http://developer.yahoo.com/geo/geoplanet/">Yahoo GeoPlanet</a></li>
+      <li><a href="http://jsonip.appspot.com">jsonip.appspot.com</a></li>
+      <li><a href="http://iplocationtools.com/ip_location_api.php">IP location tools</a></li>
+      <li><a href="http://dev.w3.org/geo/api/spec-source.html">W3C Geo location</a></li>
+      <li><a href="http://www.flickr.com/services/api/flickr.places.findByLatLon.html">Flickr.places.findByLatLon</a></li>
+    </ul>
+    <h2>Usage</h2>
+    <p>To use the geo library, simply include it in your document. There is one simple method to use which is:</p>
+<pre><code>yqlgeo.get(<em>what</em>,<em>callback</em>)</code></pre>
+    <dl>
+      <dt><em>what</em></dt>
+      <dd>is the thing you want to analyse - this could be the URL to a web document, a text, an IP, a pair of latitude and longitude information or "visitor" to detect the geographic location of the current visitor.</dd>
+      <dt><em>callback</em></dt>
+      <dd>is the callback method that will be called when there was a succesful retrieval of information. The data comes back as an object - if there was an error retrieving the information the data will be wrapped in an <code>error</code> property.</dd>
+    </dl>
+
+    <p>Check out the different use cases of the library below:</p>
+
+    <h2>Getting the geographical location from a text</h2>
+    <p>You can send an arbitrary text to the <code>get()</code> method to find the geographical information in it:</p>
+
+<pre><code>yqlgeo.get('paris,fr',function(o){
+  alert(o.place.name+' ('+
+    o.place.centroid.latitude+','+
+    o.place.centroid.longitude+
+  ')');
+})</code></pre>
+<button onclick="yqlgeo.get('paris,fr',function(o){alert(o.place.name+' ('+o.place.centroid.latitude+','+o.place.centroid.longitude+')');})">Try this out</button>
+
+  <h2>Getting the location information from lat/lon</h2>
+
+  <p>You can get all kind of data from a latitude and longitude pair. You can either send them in as two parameters or as an array:</p>
+
+<pre><code>yqlgeo.get(33.748,-84.393,function(o){
+  alert(o.place.name + ',' + o.place.country.content);
+})</code></pre>
+<button onclick="yqlgeo.get(33.748,-84.393,function(o){alert(o.place.name + ',' + o.place.country.content);})">Try this out</button>
+
+<pre><code>yqlgeo.get([33.748,-84.393],function(o){
+  alert(o.place.name + ',' + o.place.country.content);
+})</code></pre>
+<button onclick="yqlgeo.get([33.748,-84.393],function(o){alert(o.place.name + ',' + o.place.country.content);})">Try this out</button>
+
+<h2>Get all the geo locations from a certain URL</h2>
+
+<p>You can scrape a certain document at a URL for geographical locations:</p>
+
+<pre><code>yqlgeo.get('http://icant.co.uk',function(o){
+  var out = '';
+  var all = o.place.length;
+  for(var i=0;i&lt;all;i++){
+    out+=o.place[i].name+'\n';
+  };
+  alert(out);
+});</code></pre>
+<button onclick="yqlgeo.get('http://icant.co.uk',function(o){var out='';var all =o.place.length;for(var i=0;i<all;i++){out+=o.place[i].name+'\n'};alert(out)}); ">Try this out</button>
+  
+<h2>Get the place from an IP number</h2>
+
+<pre><code>yqlgeo.get('217.12.14.240',function(o){
+  alert(o.place.name + ',' + o.place.country.content +  
+        ' (' + o.place.centroid.latitude + ',' +
+               o.place.centroid.longitude + ')'
+        );
+});
+</code></pre>
+<button onclick="yqlgeo.get('217.12.14.240',function(o){alert(o.place.name + ',' +o.place.country.content +  ' ('+o.place.centroid.latitude+','+o.place.centroid.longitude+')')});">Try this out</button>
+
+<h2>Find the user (using the W3C geolocation API and IP as a fallback)</h2>
+    
+<pre><code>yqlgeo.get('visitor',function(o){
+  alert(o.place.name + ',' + o.place.country.content +  
+        ' (' + o.place.centroid.latitude + ',' +
+               o.place.centroid.longitude + ')'
+        );
+});
+</code></pre>
+<button onclick="yqlgeo.get('visitor',function(o){alert(o.place.name + ',' +o.place.country.content +  ' ('+o.place.centroid.latitude+','+o.place.centroid.longitude+')')});">Try this out</button>
+
+<h2>Download the library</h2>
+
+<p>You can get the library directly <a href="yqlgeo.js">from here by saving this link</a> or by <a href="">getting the source code from GitHub</a>.</p>
+    
+  </div>
+  <div id="ft" role="contentinfo">
+    <p>Written by <a href="http://wait-till-i.com">Chris Heilmann</a> using <a href="http://developer.yahoo.com/yql">YQL</a>.</p>
+  </div>
+
+</div>
+
+<script src="yqlgeo.js"></script>
+
+</body>
+</html>
+
