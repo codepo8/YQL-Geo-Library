@@ -99,13 +99,17 @@
 <h2>Find the user (using the W3C geolocation API and IP as a fallback)</h2>
     
 <pre><code>yqlgeo.get('visitor',function(o){
-  alert(o.place.name + ',' + o.place.country.content +  
-        ' (' + o.place.centroid.latitude + ',' +
-               o.place.centroid.longitude + ')'
-        );
+  if(o.error){
+    alert('No location found for user :('); // some IPs are not in the DB :(
+  } else {
+    alert(o.place.name + ',' + o.place.country.content +  
+          ' (' + o.place.centroid.latitude + ',' +
+                 o.place.centroid.longitude + ')'
+          );
+  }
 });
 </code></pre>
-<button onclick="yqlgeo.get('visitor',function(o){alert(o.place.name + ',' +o.place.country.content +  ' ('+o.place.centroid.latitude+','+o.place.centroid.longitude+')')});">Try this out</button>
+<button onclick="yqlgeo.get('visitor',function(o){if(o.error){alert('No location found for user :(');} else {alert(o.place.name + ',' + o.place.country.content + ' (' + o.place.centroid.latitude + ',' +o.place.centroid.longitude + ')');}});">Try this out</button>
 
 <h2>Download the library</h2>
 

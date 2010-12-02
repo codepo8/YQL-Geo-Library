@@ -58,7 +58,7 @@ var yqlgeo = function(){
   function getFromIP(ip){
     var yql = 'select * from geo.places where woeid in ('+
               'select place.woeid from flickr.places where (lat,lon) in('+
-              'select Latitude,Longitude from ip.location'+
+              'select latitude,longitude from pidgets.geoip'+
               ' where ip="'+ip+'"))';
     load(yql,'yqlgeo.retrieved');
   };
@@ -122,7 +122,7 @@ var yqlgeo = function(){
   };
 
   function retrieved(o){
-    if(o.query.results){
+    if(o.query.results !== null){
       callback(o.query.results);
     } else {
       callback({error:o.query});
